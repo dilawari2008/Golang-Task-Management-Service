@@ -3,20 +3,16 @@ syntax = "proto3";
 package task;
 option go_package = "github.com/yourusername/go-task-mgmt/proto";
 
-// Task service definition
 service TaskService {
-  // GetAllTasks returns a list of tasks with pagination and filtering
   rpc GetAllTasks(GetAllTasksRequest) returns (GetAllTasksResponse);
 }
 
-// Request message for GetAllTasks
 message GetAllTasksRequest {
   int32 page = 1;
   int32 limit = 2;
   map<string, string> filters = 3;
 }
 
-// Response message for GetAllTasks
 message GetAllTasksResponse {
   bool success = 1;
   repeated Task tasks = 2;
@@ -24,7 +20,6 @@ message GetAllTasksResponse {
   string error = 4;
 }
 
-// Task message
 message Task {
   int64 Id = 1;
   string title = 2;
@@ -34,7 +29,6 @@ message Task {
   int64 updated_at = 6;
 }
 
-// Pagination message
 message Pagination {
   int32 current_page = 1;
   int32 total_pages = 2;

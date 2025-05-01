@@ -22,39 +22,31 @@ import (
 )
 
 func main() {
-	// Load configuration
 	cfg, err := config.LoadConfig()
 	if err != nil {
 		log.Fatalf("Failed to load configuration: %v", err)
 	}
 
-	// Setup database
 	db, err := config.SetupDatabase(&cfg.Database)
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
-	// Create repository
 	taskRepo := repository.NewGormTaskRepository(db)
 	
-	// Create service
 	taskService := services.NewTaskService(taskRepo)
 	
-	// Create REST handler
 	taskHandler := handlers.NewTaskHandler(taskService)
 	
-	// Setup Gin router
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
 	api.SetupRoutes(router, taskHandler)
 	
-	// Configure HTTP server
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%s", cfg.Server.Port),
 		Handler: router,
 	}
 	
-	// Start REST server in a goroutine
 	go func() {
 		log.Printf("Starting REST server on port %s\n", cfg.Server.Port)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -62,7 +54,6 @@ func main() {
 		}
 	}()
 	
-	// Start gRPC server in a goroutine
 	go func() {
 		grpcPort, err := strconv.Atoi(cfg.GrpcServer.Port)
 		if err != nil {
@@ -74,14 +65,12 @@ func main() {
 		}
 	}()
 	
-	// Wait for interrupt signal
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 	
 	log.Println("Shutting down servers...")
 	
-	// Graceful shutdown with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	

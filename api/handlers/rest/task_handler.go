@@ -12,26 +12,22 @@ import (
 	"task-management-system/services"
 )
 
-// TaskHandler handles HTTP requests for tasks
 type TaskHandler struct {
 	service services.TaskService
 }
 
-// NewTaskHandler creates a new task handler
 func NewTaskHandler(service services.TaskService) *TaskHandler {
 	return &TaskHandler{
 		service: service,
 	}
 }
 
-// CreateTaskRequest represents the request body for creating a task
 type CreateTaskRequest struct {
 	Title       string    `json:"title" binding:"required"`
 	Description string    `json:"description"`
 	DueDate     time.Time `json:"due_date"`
 }
 
-// UpdateTaskRequest represents the request body for updating a task
 type UpdateTaskRequest struct {
 	Title       string    `json:"title"`
 	Description string    `json:"description"`
@@ -39,23 +35,6 @@ type UpdateTaskRequest struct {
 	DueDate     time.Time `json:"due_date" time_format:"2006-01-02T15:04:05Z07:00"`
 }
 
-// Example JSON payload:
-// {
-//   "title": "Update project documentation",
-//   "description": "Review and update all API documentation for the new release",
-//   "status": "in_progress",
-//   "due_date": "2023-12-31T23:59:59Z"
-// }
-
-// Example JSON payload for UpdateTaskRequest:
-// {
-//   "title": "Update project documentation",
-//   "description": "Review and update all API documentation for the new release",
-//   "status": "in_progress",
-//   "due_date": "2023-12-31T23:59:59Z"
-// }
-
-// Response represents the standard API response
 type Response struct {
 	Success    bool        `json:"success"`
 	Data       interface{} `json:"data,omitempty"`
@@ -63,7 +42,6 @@ type Response struct {
 	Error      string      `json:"error,omitempty"`
 }
 
-// CreateTask handles the creation of a new task
 func (h *TaskHandler) CreateTask(c *gin.Context) {
 	var req CreateTaskRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -84,7 +62,6 @@ func (h *TaskHandler) CreateTask(c *gin.Context) {
 	c.JSON(http.StatusCreated, Response{Success: true, Data: task})
 }
 
-// GetTask handles retrieving a task by ID
 func (h *TaskHandler) GetTask(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
@@ -106,9 +83,7 @@ func (h *TaskHandler) GetTask(c *gin.Context) {
 	c.JSON(http.StatusOK, Response{Success: true, Data: task})
 }
 
-// GetTasks handles retrieving all tasks with pagination and filtering
 func (h *TaskHandler) GetTasks(c *gin.Context) {
-	// Get page and limit parameters
 	pageStr := c.DefaultQuery("page", "1")
 	limitStr := c.DefaultQuery("limit", "10")
 
@@ -122,7 +97,6 @@ func (h *TaskHandler) GetTasks(c *gin.Context) {
 		limit = 10
 	}
 
-	// Get filters
 	filters := make(map[string]string)
 	if status := c.Query("status"); status != "" {
 		filters["status"] = status
@@ -145,7 +119,6 @@ func (h *TaskHandler) GetTasks(c *gin.Context) {
 	})
 }
 
-// UpdateTask handles updating a task
 func (h *TaskHandler) UpdateTask(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
@@ -176,7 +149,6 @@ func (h *TaskHandler) UpdateTask(c *gin.Context) {
 	c.JSON(http.StatusOK, Response{Success: true, Data: task})
 }
 
-// DeleteTask handles deleting a task
 func (h *TaskHandler) DeleteTask(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 32)

@@ -5,7 +5,6 @@ import (
 	"time"
 )
 
-// Task represents a task in the system with GORM tags
 type Task struct {
 	ID          uint       `gorm:"primaryKey" json:"id"`
 	Title       string     `gorm:"not null" json:"title" binding:"required"`
@@ -17,7 +16,6 @@ type Task struct {
 	DeletedAt   *time.Time `gorm:"index" json:"deleted_at"`
 }
 
-// TaskStatus defines the possible statuses for a task
 type TaskStatus string
 
 const (
@@ -26,7 +24,6 @@ const (
 	StatusCompleted  TaskStatus = "completed"
 )
 
-// NewTask creates a new task with default values
 func NewTask(title, description string, dueDate time.Time) *Task {
 	return &Task{
 		Title:       title,
@@ -36,12 +33,10 @@ func NewTask(title, description string, dueDate time.Time) *Task {
 	}
 }
 
-// IsValidStatus checks if a status is valid
 func IsValidStatus(status string) bool {
 	return status == string(StatusPending) ||
 		status == string(StatusInProgress) ||
 		status == string(StatusCompleted)
 }
 
-// ErrInvalidStatus is returned when an invalid status is provided
 var ErrInvalidStatus = errors.New("invalid status value")
