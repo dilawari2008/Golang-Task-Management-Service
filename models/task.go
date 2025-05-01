@@ -3,6 +3,8 @@ package models
 import (
 	"errors"
 	"time"
+
+	"task-management-system/constants"
 )
 
 type Task struct {
@@ -18,34 +20,20 @@ type Task struct {
 type TaskStatus string
 type TaskTopic string
 
-const (
-	StatusPending   TaskStatus = "pending"
-	StatusInProgress TaskStatus = "in_progress"
-	StatusCompleted TaskStatus = "completed"
-	StatusFailed    TaskStatus = "failed"
-	StatusExpired   TaskStatus = "expired"
-)
-
-const (
-	TopicConsumer1 TaskTopic = "consumer1"
-	TopicConsumer2 TaskTopic = "consumer2"
-	TopicConsumer3 TaskTopic = "consumer3"
-)
-
 func NewTask(topic string, data string) *Task {
 	return &Task{
-		Status:      string(StatusPending),
-		Topic:       string(topic),
-		Data:        data,
+		Status: string(constants.StatusPending),
+		Topic:  string(topic),
+		Data:   data,
 	}
 }
 
 func IsValidStatus(status string) bool {
-	return status == string(StatusPending) ||
-		status == string(StatusInProgress) ||
-		status == string(StatusCompleted) ||
-		status == string(StatusFailed) ||
-		status == string(StatusExpired)
+	return status == string(constants.StatusPending) ||
+		status == string(constants.StatusInProgress) ||
+		status == string(constants.StatusCompleted) ||
+		status == string(constants.StatusFailed) ||
+		status == string(constants.StatusExpired)
 }
 
 var ErrInvalidStatus = errors.New("invalid status value")
