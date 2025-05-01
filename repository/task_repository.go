@@ -63,7 +63,7 @@ func (r *GormTaskRepository) GetAll(page, limit int, filters map[string]string) 
 		return nil, 0, err
 	}
 
-	if err := query.Offset(offset).Limit(limit).Order("created_at desc").Find(&tasks).Error; err != nil {
+	if err := query.Offset(offset).Limit(limit).Order("created_at asc").Find(&tasks).Error; err != nil {
 		return nil, 0, err
 	}
 

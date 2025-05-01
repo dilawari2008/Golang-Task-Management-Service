@@ -56,6 +56,7 @@ func (s *TaskServer) GetAllTasks(ctx context.Context, req *proto.GetAllTasksRequ
 			Status:      task.Status,
 			CreatedAt:   task.CreatedAt.Unix(),
 			UpdatedAt:   task.UpdatedAt.Unix(),
+			ErrorMessage: task.ErrorMessage,
 		}
 	}
 

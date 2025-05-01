@@ -25,10 +25,7 @@ const (
 // TaskServiceClient is the client API for TaskService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-//
-// Task service definition
 type TaskServiceClient interface {
-	// GetAllTasks returns a list of tasks with pagination and filtering
 	GetAllTasks(ctx context.Context, in *GetAllTasksRequest, opts ...grpc.CallOption) (*GetAllTasksResponse, error)
 }
 
@@ -53,10 +50,7 @@ func (c *taskServiceClient) GetAllTasks(ctx context.Context, in *GetAllTasksRequ
 // TaskServiceServer is the server API for TaskService service.
 // All implementations must embed UnimplementedTaskServiceServer
 // for forward compatibility.
-//
-// Task service definition
 type TaskServiceServer interface {
-	// GetAllTasks returns a list of tasks with pagination and filtering
 	GetAllTasks(context.Context, *GetAllTasksRequest) (*GetAllTasksResponse, error)
 	mustEmbedUnimplementedTaskServiceServer()
 }

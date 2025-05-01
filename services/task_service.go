@@ -2,7 +2,9 @@ package services
 
 import (
 	"errors"
+	"fmt"
 
+	"task-management-system/constants"
 	"task-management-system/models"
 	"task-management-system/repository"
 )
@@ -21,12 +23,14 @@ type TaskService interface {
 }
 
 type TaskServiceImpl struct {
-	repo repository.TaskRepository
+	repo      repository.TaskRepository
+	taskQueue *TaskQueue
 }
 
-func NewTaskService(repo repository.TaskRepository) TaskService {
+func NewTaskService(repo repository.TaskRepository, taskQueue *TaskQueue) TaskService {
 	return &TaskServiceImpl{
-		repo: repo,
+		repo:      repo,
+		taskQueue: taskQueue,
 	}
 }
 
@@ -40,6 +44,8 @@ func (s *TaskServiceImpl) CreateTask(topic, data string) (*models.Task, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	s.taskQueue.Push(task)
 
 	return task, nil
 }
@@ -68,17 +74,21 @@ func (s *TaskServiceImpl) GetTasks(page, limit int, filters map[string]string) (
 	return tasks, pagination, nil
 }
 
-func (s *TaskServiceImpl) UpdateTask(id uint, topic, data, status string) (*models.Task, error) {
+func (s *TaskServiceImpl) UpdateTask(id uint, topic string, data string, status string) (*models.Task, error) {
 	task, err := s.repo.GetByID(id)
 	if err != nil {
 		return nil, err
 	}
 
-	if topic != "" {
+	if task.Status != string(constants.StatusPending) && (topic != "" || data != "") {
+		return nil, errors.New("can only update topic and data when task status is pending")
+	}
+
+	if topic != "" && task.Status == string(constants.StatusPending) {
 		task.Topic = topic
 	}
 
-	if data != "" {
+	if data != "" && task.Status == string(constants.StatusPending) {
 		task.Data = data
 	}
 
@@ -86,6 +96,11 @@ func (s *TaskServiceImpl) UpdateTask(id uint, topic, data, status string) (*mode
 		if !models.IsValidStatus(status) {
 			return nil, models.ErrInvalidStatus
 		}
+
+		if !isValidStatusTransition(task.Status, status) {
+			return nil, fmt.Errorf("invalid status transition: cannot change from %s to %s", task.Status, status)
+		}
+
 		task.Status = status
 	}
 
@@ -94,7 +109,24 @@ func (s *TaskServiceImpl) UpdateTask(id uint, topic, data, status string) (*mode
 		return nil, err
 	}
 
+	s.taskQueue.Push(task)
+
 	return task, nil
+}
+
+func isValidStatusTransition(currentStatus, newStatus string) bool {
+	hierarchyLevel := map[string]int{
+		string(constants.StatusPending):    1,
+		string(constants.StatusInProgress): 2,
+		string(constants.StatusCompleted):  3,
+		string(constants.StatusFailed):     3,
+		string(constants.StatusExpired):    3,
+	}
+
+	currentLevel, _ := hierarchyLevel[currentStatus]
+	newLevel, _ := hierarchyLevel[newStatus]
+
+	return newLevel >= currentLevel
 }
 
 func (s *TaskServiceImpl) DeleteTask(id uint) error {

@@ -21,7 +21,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Request message for GetAllTasks
 type GetAllTasksRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
@@ -82,7 +81,6 @@ func (x *GetAllTasksRequest) GetFilters() map[string]string {
 	return nil
 }
 
-// Response message for GetAllTasks
 type GetAllTasksResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
@@ -151,7 +149,6 @@ func (x *GetAllTasksResponse) GetError() string {
 	return ""
 }
 
-// Task message
 type Task struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int64                  `protobuf:"varint,1,opt,name=Id,proto3" json:"Id,omitempty"`
@@ -160,6 +157,7 @@ type Task struct {
 	Status        string                 `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty"`
 	CreatedAt     int64                  `protobuf:"varint,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     int64                  `protobuf:"varint,6,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	ErrorMessage  string                 `protobuf:"bytes,7,opt,name=error_message,json=errorMessage,proto3" json:"error_message,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -236,7 +234,13 @@ func (x *Task) GetUpdatedAt() int64 {
 	return 0
 }
 
-// Pagination message
+func (x *Task) GetErrorMessage() string {
+	if x != nil {
+		return x.ErrorMessage
+	}
+	return ""
+}
+
 type Pagination struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	CurrentPage   int32                  `protobuf:"varint,1,opt,name=current_page,json=currentPage,proto3" json:"current_page,omitempty"`
@@ -325,16 +329,17 @@ const file_task_proto_rawDesc = "" +
 	"\n" +
 	"pagination\x18\x03 \x01(\v2\x10.task.PaginationR\n" +
 	"pagination\x12\x14\n" +
-	"\x05error\x18\x04 \x01(\tR\x05error\"\xa4\x01\n" +
+	"\x05error\x18\x04 \x01(\tR\x05error\"\xbb\x01\n" +
 	"\x04Task\x12\x0e\n" +
 	"\x02Id\x18\x01 \x01(\x03R\x02Id\x12\x14\n" +
-	"\x05title\x18\x02 \x01(\tR\x05title\x12 \n" +
-	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x16\n" +
+	"\x05topic\x18\x02 \x01(\tR\x05topic\x12\x12\n" +
+	"\x04data\x18\x03 \x01(\tR\x04data\x12\x16\n" +
 	"\x06status\x18\x04 \x01(\tR\x06status\x12\x1d\n" +
 	"\n" +
 	"created_at\x18\x05 \x01(\x03R\tcreatedAt\x12\x1d\n" +
 	"\n" +
-	"updated_at\x18\x06 \x01(\x03R\tupdatedAt\"\x8e\x01\n" +
+	"updated_at\x18\x06 \x01(\x03R\tupdatedAt\x12#\n" +
+	"\rerror_message\x18\a \x01(\tR\ferrorMessage\"\x8e\x01\n" +
 	"\n" +
 	"Pagination\x12!\n" +
 	"\fcurrent_page\x18\x01 \x01(\x05R\vcurrentPage\x12\x1f\n" +

@@ -19,6 +19,7 @@ import (
 	"task-management-system/config"
 	"task-management-system/repository"
 	"task-management-system/services"
+
 )
 
 func main() {
@@ -33,9 +34,10 @@ func main() {
 	}
 
 	taskRepo := repository.NewGormTaskRepository(db)
-	
-	taskService := services.NewTaskService(taskRepo)
-	
+	taskQueue := services.NewTaskQueue()
+	taskService := services.NewTaskService(taskRepo, taskQueue)
+	taskConsumer := services.NewTaskConsumer(taskQueue, taskRepo)
+	taskConsumer.Start()
 	taskHandler := handlers.NewTaskHandler(taskService)
 	
 	gin.SetMode(gin.ReleaseMode)
