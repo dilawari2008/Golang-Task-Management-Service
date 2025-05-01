@@ -3,8 +3,8 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 
-	"task-management-system/api/handlers"
-	"task-management-system/api/middleware"
+	"task-management-system/api/handlers/rest"
+	"task-management-system/api/middleware/rest"
 )
 
 // SetupRoutes configures the API routes

@@ -13,7 +13,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"task-management-system/api"
-	"task-management-system/api/handlers"
+	"task-management-system/api/handlers/rest"
 	"task-management-system/config"
 	"task-management-system/services"
 	"task-management-system/repository"
