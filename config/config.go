@@ -14,12 +14,18 @@ import (
 
 // Config holds all configuration for the application
 type Config struct {
-	Server   ServerConfig
-	Database DatabaseConfig
+	Server     ServerConfig
+	GrpcServer GrpcServerConfig
+	Database   DatabaseConfig
 }
 
-// ServerConfig holds server-specific configuration
+// ServerConfig holds REST server-specific configuration
 type ServerConfig struct {
+	Port string
+}
+
+// GrpcServerConfig holds gRPC server-specific configuration
+type GrpcServerConfig struct {
 	Port string
 }
 
@@ -41,6 +47,7 @@ func LoadConfig() (*Config, error) {
 
 	// Default values
 	viper.SetDefault("SERVER_PORT", "8080")
+	viper.SetDefault("GRPC_PORT", "9090")
 	viper.SetDefault("DATABASE_URL", "postgres://postgres:postgres@localhost:5432/taskdb?sslmode=disable")
 
 	// Try to read from config file
@@ -57,9 +64,18 @@ func LoadConfig() (*Config, error) {
 		dbURL = viper.GetString("DATABASE_URL")
 	}
 
+	// Get gRPC port from environment or config
+	grpcPort := os.Getenv("GRPC_PORT")
+	if grpcPort == "" {
+		grpcPort = viper.GetString("GRPC_PORT")
+	}
+
 	config := &Config{
 		Server: ServerConfig{
 			Port: viper.GetString("SERVER_PORT"),
+		},
+		GrpcServer: GrpcServerConfig{
+			Port: grpcPort,
 		},
 		Database: DatabaseConfig{
 			URL: dbURL,

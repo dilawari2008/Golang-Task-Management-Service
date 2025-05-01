@@ -7,16 +7,18 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 
 	"github.com/gin-gonic/gin"
 
 	"task-management-system/api"
+	"task-management-system/api/handlers/grpc"
 	"task-management-system/api/handlers/rest"
 	"task-management-system/config"
-	"task-management-system/services"
 	"task-management-system/repository"
+	"task-management-system/services"
 )
 
 func main() {
@@ -38,7 +40,7 @@ func main() {
 	// Create service
 	taskService := services.NewTaskService(taskRepo)
 	
-	// Create handler
+	// Create REST handler
 	taskHandler := handlers.NewTaskHandler(taskService)
 	
 	// Setup Gin router
@@ -46,17 +48,29 @@ func main() {
 	router := gin.New()
 	api.SetupRoutes(router, taskHandler)
 	
-	// Configure server
+	// Configure HTTP server
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%s", cfg.Server.Port),
 		Handler: router,
 	}
 	
-	// Start server in a goroutine
+	// Start REST server in a goroutine
 	go func() {
-		log.Printf("Starting server on port %s\n", cfg.Server.Port)
+		log.Printf("Starting REST server on port %s\n", cfg.Server.Port)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("Server error: %v", err)
+			log.Fatalf("REST server error: %v", err)
+		}
+	}()
+	
+	// Start gRPC server in a goroutine
+	go func() {
+		grpcPort, err := strconv.Atoi(cfg.GrpcServer.Port)
+		if err != nil {
+			log.Fatalf("Invalid gRPC port: %v", err)
+		}
+		
+		if err := grpc.StartServer(taskService, grpcPort); err != nil {
+			log.Fatalf("gRPC server error: %v", err)
 		}
 	}()
 	
@@ -65,7 +79,7 @@ func main() {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 	
-	log.Println("Shutting down server...")
+	log.Println("Shutting down servers...")
 	
 	// Graceful shutdown with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -75,5 +89,5 @@ func main() {
 		log.Fatalf("Server shutdown error: %v", err)
 	}
 	
-	log.Println("Server stopped")
+	log.Println("Servers stopped")
 }
