@@ -57,6 +57,7 @@ func (c *TaskConsumer) consumeTasks() {
 	log.Println("Task consumer stopped")
 }
 func (c *TaskConsumer) processNextTask() {
+	// 1. start: pre-process
 	task := c.queue.Pop()
 	if task == nil {
 		return
@@ -69,9 +70,13 @@ func (c *TaskConsumer) processNextTask() {
 		log.Printf("Unknown topic: %s", task.Topic)
 		return
 	}
+	// 1. end: pre-process
 
+	// 2. start: process
 	success, err := consumer.Process(task)
+	// 2. end: process
 
+	// 3. start: post-process
 	if success && err == nil {
 		task.Status = string(constants.StatusCompleted)
 		log.Printf("Successfully completed task ID: %d, status updated to completed", task.ID)
@@ -87,4 +92,5 @@ func (c *TaskConsumer) processNextTask() {
 	if err := c.repo.Update(task); err != nil {
 		log.Printf("Failed to update task status in repository: %v", err)
 	}
+	// 3. end: post-process
 }
