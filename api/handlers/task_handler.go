@@ -8,8 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"task-management-system/models"
-	"task-management-system/services"
 	"task-management-system/repository"
+	"task-management-system/services"
 )
 
 // TaskHandler handles HTTP requests for tasks
@@ -111,23 +111,23 @@ func (h *TaskHandler) GetTasks(c *gin.Context) {
 	// Get page and limit parameters
 	pageStr := c.DefaultQuery("page", "1")
 	limitStr := c.DefaultQuery("limit", "10")
-	
+
 	page, err := strconv.Atoi(pageStr)
 	if err != nil || page < 1 {
 		page = 1
 	}
-	
+
 	limit, err := strconv.Atoi(limitStr)
 	if err != nil || limit < 1 {
 		limit = 10
 	}
-	
+
 	// Get filters
 	filters := make(map[string]string)
 	if status := c.Query("status"); status != "" {
 		filters["status"] = status
 	}
-	
+
 	tasks, pagination, err := h.service.GetTasks(page, limit, filters)
 	if err != nil {
 		if err == models.ErrInvalidStatus {
@@ -137,7 +137,7 @@ func (h *TaskHandler) GetTasks(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, Response{Success: false, Error: "Internal server error"})
 		return
 	}
-	
+
 	c.JSON(http.StatusOK, Response{
 		Success:    true,
 		Data:       tasks,
@@ -153,13 +153,13 @@ func (h *TaskHandler) UpdateTask(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, Response{Success: false, Error: "Invalid task ID"})
 		return
 	}
-	
+
 	var req UpdateTaskRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, Response{Success: false, Error: "Invalid request body"})
 		return
 	}
-	
+
 	task, err := h.service.UpdateTask(uint(id), req.Title, req.Description, req.Status, req.DueDate)
 	if err != nil {
 		switch err {
@@ -172,7 +172,7 @@ func (h *TaskHandler) UpdateTask(c *gin.Context) {
 		}
 		return
 	}
-	
+
 	c.JSON(http.StatusOK, Response{Success: true, Data: task})
 }
 
@@ -184,7 +184,7 @@ func (h *TaskHandler) DeleteTask(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, Response{Success: false, Error: "Invalid task ID"})
 		return
 	}
-	
+
 	err = h.service.DeleteTask(uint(id))
 	if err != nil {
 		if err == repository.ErrTaskNotFound {
@@ -194,6 +194,6 @@ func (h *TaskHandler) DeleteTask(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, Response{Success: false, Error: "Internal server error"})
 		return
 	}
-	
+
 	c.JSON(http.StatusOK, Response{Success: true, Data: map[string]string{"message": "Task deleted successfully"}})
 }

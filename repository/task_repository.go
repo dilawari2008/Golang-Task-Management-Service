@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+	"time"
 
 	"gorm.io/gorm"
 
@@ -42,7 +43,7 @@ func (r *GormTaskRepository) Create(task *models.Task) error {
 // GetByID retrieves a task by its ID
 func (r *GormTaskRepository) GetByID(id uint) (*models.Task, error) {
 	var task models.Task
-	result := r.db.First(&task, id)
+	result := r.db.Where("deleted_at IS NULL").First(&task, id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, ErrTaskNotFound
@@ -56,32 +57,32 @@ func (r *GormTaskRepository) GetByID(id uint) (*models.Task, error) {
 func (r *GormTaskRepository) GetAll(page, limit int, filters map[string]string) ([]*models.Task, int64, error) {
 	var tasks []*models.Task
 	var totalCount int64
-	
+
 	offset := (page - 1) * limit
-	
-	query := r.db.Model(&models.Task{})
-	
+
+	query := r.db.Model(&models.Task{}).Where("deleted_at IS NULL")
+
 	// Apply filters
 	if status, ok := filters["status"]; ok && status != "" {
 		query = query.Where("status = ?", status)
 	}
-	
+
 	// Get total count
 	if err := query.Count(&totalCount).Error; err != nil {
 		return nil, 0, err
 	}
-	
+
 	// Get paginated results
 	if err := query.Offset(offset).Limit(limit).Order("created_at desc").Find(&tasks).Error; err != nil {
 		return nil, 0, err
 	}
-	
+
 	return tasks, totalCount, nil
 }
 
 // Update updates an existing task
 func (r *GormTaskRepository) Update(task *models.Task) error {
-	result := r.db.Save(task)
+	result := r.db.Where("deleted_at IS NULL").Save(task)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -91,9 +92,9 @@ func (r *GormTaskRepository) Update(task *models.Task) error {
 	return nil
 }
 
-// Delete removes a task from the repository
+// Delete marks a task as deleted
 func (r *GormTaskRepository) Delete(id uint) error {
-	result := r.db.Delete(&models.Task{}, id)
+	result := r.db.Model(&models.Task{}).Where("id = ? AND deleted_at IS NULL", id).Update("deleted_at", time.Now())
 	if result.Error != nil {
 		return result.Error
 	}

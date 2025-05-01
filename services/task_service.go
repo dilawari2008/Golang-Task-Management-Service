@@ -110,7 +110,7 @@ func (s *TaskServiceImpl) UpdateTask(id uint, title, description, status string,
 	return task, nil
 }
 
-// DeleteTask deletes a task
+// DeleteTask  deletes a task
 func (s *TaskServiceImpl) DeleteTask(id uint) error {
 	return s.repo.Delete(id)
 }
