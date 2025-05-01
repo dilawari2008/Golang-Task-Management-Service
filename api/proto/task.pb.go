@@ -155,8 +155,8 @@ func (x *GetAllTasksResponse) GetError() string {
 type Task struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int64                  `protobuf:"varint,1,opt,name=Id,proto3" json:"Id,omitempty"`
-	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
-	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Topic         string                 `protobuf:"bytes,2,opt,name=topic,proto3" json:"topic,omitempty"`
+	Data          string                 `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
 	Status        string                 `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty"`
 	CreatedAt     int64                  `protobuf:"varint,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     int64                  `protobuf:"varint,6,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
@@ -201,16 +201,16 @@ func (x *Task) GetId() int64 {
 	return 0
 }
 
-func (x *Task) GetTitle() string {
+func (x *Task) GetTopic() string {
 	if x != nil {
-		return x.Title
+		return x.Topic
 	}
 	return ""
 }
 
-func (x *Task) GetDescription() string {
+func (x *Task) GetData() string {
 	if x != nil {
-		return x.Description
+		return x.Data
 	}
 	return ""
 }

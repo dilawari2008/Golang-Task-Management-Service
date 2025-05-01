@@ -51,8 +51,8 @@ func (s *TaskServer) GetAllTasks(ctx context.Context, req *proto.GetAllTasksRequ
 	for i, task := range tasks {
 		protoTasks[i] = &proto.Task{
 			Id:          int64(task.ID),
-			Title:       task.Title,
-			Description: task.Description,
+			Topic:       task.Topic,
+			Data:        task.Data,
 			Status:      task.Status,
 			CreatedAt:   task.CreatedAt.Unix(),
 			UpdatedAt:   task.UpdatedAt.Unix(),

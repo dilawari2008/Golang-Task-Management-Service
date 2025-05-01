@@ -3,7 +3,6 @@ package handlers
 import (
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -23,16 +22,14 @@ func NewTaskHandler(service services.TaskService) *TaskHandler {
 }
 
 type CreateTaskRequest struct {
-	Title       string    `json:"title" binding:"required"`
-	Description string    `json:"description"`
-	DueDate     time.Time `json:"due_date"`
+	Topic string `json:"topic" binding:"required"`
+	Data  string `json:"data"`
 }
 
 type UpdateTaskRequest struct {
-	Title       string    `json:"title"`
-	Description string    `json:"description"`
-	Status      string    `json:"status" binding:"omitempty,oneof=pending in_progress completed"`
-	DueDate     time.Time `json:"due_date" time_format:"2006-01-02T15:04:05Z07:00"`
+	Topic  string `json:"topic"`
+	Data   string `json:"data"`
+	Status string `json:"status" binding:"omitempty,oneof=pending in_progress completed failed expired"`
 }
 
 type Response struct {
@@ -49,7 +46,7 @@ func (h *TaskHandler) CreateTask(c *gin.Context) {
 		return
 	}
 
-	task, err := h.service.CreateTask(req.Title, req.Description, req.DueDate)
+	task, err := h.service.CreateTask(req.Topic, req.Data)
 	if err != nil {
 		if err == services.ErrInvalidTask {
 			c.JSON(http.StatusBadRequest, Response{Success: false, Error: err.Error()})
@@ -133,7 +130,7 @@ func (h *TaskHandler) UpdateTask(c *gin.Context) {
 		return
 	}
 
-	task, err := h.service.UpdateTask(uint(id), req.Title, req.Description, req.Status, req.DueDate)
+	task, err := h.service.UpdateTask(uint(id), req.Topic, req.Data, req.Status)
 	if err != nil {
 		switch err {
 		case repository.ErrTaskNotFound:

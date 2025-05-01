@@ -2,7 +2,6 @@ package services
 
 import (
 	"errors"
-	"time"
 
 	"task-management-system/models"
 	"task-management-system/repository"
@@ -14,10 +13,10 @@ var (
 )
 
 type TaskService interface {
-	CreateTask(title, description string, dueDate time.Time) (*models.Task, error)
+	CreateTask(topic, data string) (*models.Task, error)
 	GetTaskByID(id uint) (*models.Task, error)
 	GetTasks(page, limit int, filters map[string]string) ([]*models.Task, *models.Pagination, error)
-	UpdateTask(id uint, title, description, status string, dueDate time.Time) (*models.Task, error)
+	UpdateTask(id uint, topic, data, status string) (*models.Task, error)
 	DeleteTask(id uint) error
 }
 
@@ -31,12 +30,12 @@ func NewTaskService(repo repository.TaskRepository) TaskService {
 	}
 }
 
-func (s *TaskServiceImpl) CreateTask(title, description string, dueDate time.Time) (*models.Task, error) {
-	if title == "" {
+func (s *TaskServiceImpl) CreateTask(topic, data string) (*models.Task, error) {
+	if topic == "" {
 		return nil, ErrInvalidTask
 	}
 
-	task := models.NewTask(title, description, dueDate)
+	task := models.NewTask(topic, data)
 	err := s.repo.Create(task)
 	if err != nil {
 		return nil, err
@@ -69,18 +68,18 @@ func (s *TaskServiceImpl) GetTasks(page, limit int, filters map[string]string) (
 	return tasks, pagination, nil
 }
 
-func (s *TaskServiceImpl) UpdateTask(id uint, title, description, status string, dueDate time.Time) (*models.Task, error) {
+func (s *TaskServiceImpl) UpdateTask(id uint, topic, data, status string) (*models.Task, error) {
 	task, err := s.repo.GetByID(id)
 	if err != nil {
 		return nil, err
 	}
 
-	if title != "" {
-		task.Title = title
+	if topic != "" {
+		task.Topic = topic
 	}
 
-	if description != "" {
-		task.Description = description
+	if data != "" {
+		task.Data = data
 	}
 
 	if status != "" {
@@ -88,10 +87,6 @@ func (s *TaskServiceImpl) UpdateTask(id uint, title, description, status string,
 			return nil, models.ErrInvalidStatus
 		}
 		task.Status = status
-	}
-
-	if !dueDate.IsZero() {
-		task.DueDate = dueDate
 	}
 
 	err = s.repo.Update(task)
