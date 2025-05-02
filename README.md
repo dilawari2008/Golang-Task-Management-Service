@@ -42,29 +42,31 @@
 
 ## API Usage Examples
 ### Create a Task
+```
 curl --location 'localhost:8080/api/tasks/' \
 --header 'Content-Type: application/json' \
 --data '{
   "topic": "consumer2",
   "data": "consumer2 data"
 }'
+```
 
 ### Get tasks list by filtering and pagination
-curl --location 'localhost:8080/api/tasks?status=completed&page=1&limit=10'
+```curl --location 'localhost:8080/api/tasks?status=completed&page=1&limit=10'```
 
 ### Get task by id
-curl --location 'localhost:8080/api/tasks/25'
+```curl --location 'localhost:8080/api/tasks/25'```
 
 ### Update task by id
-curl --location --request PUT 'localhost:8080/api/tasks/24' \
+```curl --location --request PUT 'localhost:8080/api/tasks/24' \
 --header 'Content-Type: application/json' \
 --data '{
   "status": "pending"
-}'
+}'```
 
 ### Delete task by id
-curl --location --request DELETE 'localhost:8080/api/tasks/24' \
---header 'Content-Type: application/json'
+```curl --location --request DELETE 'localhost:8080/api/tasks/24' \
+--header 'Content-Type: application/json'```
 
 
 # Technical Overview: Task Processing System
