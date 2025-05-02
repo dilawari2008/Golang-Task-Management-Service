@@ -52,24 +52,38 @@ curl --location 'localhost:8080/api/tasks/' \
 ```
 
 ### Get tasks list by filtering and pagination
-```curl --location 'localhost:8080/api/tasks?status=completed&page=1&limit=10'```
+```
+curl --location 'localhost:8080/api/tasks?status=completed&page=1&limit=10'
+```
 
 ### Get task by id
-```curl --location 'localhost:8080/api/tasks/25'```
+```
+curl --location 'localhost:8080/api/tasks/25'
+```
 
 ### Update task by id
-```curl --location --request PUT 'localhost:8080/api/tasks/24' \
+```
+curl --location --request PUT 'localhost:8080/api/tasks/24' \
 --header 'Content-Type: application/json' \
 --data '{
   "status": "pending"
-}'```
+}'
+```
 
 ### Delete task by id
-```curl --location --request DELETE 'localhost:8080/api/tasks/24' \
---header 'Content-Type: application/json'```
+```
+curl --location --request DELETE 'localhost:8080/api/tasks/24' \
+--header 'Content-Type: application/json'
+```
 
 
-# Technical Overview: Task Processing System
+# Technical Overview
+
+![image](https://github.com/user-attachments/assets/e73feb57-4ebb-4165-ac88-a0feb29bd473)
+
+
+![Screenshot 2025-05-02 at 6 04 52 AM](https://github.com/user-attachments/assets/35994a30-4c7c-4cf1-961b-a1d72dea805e)
+
 
 ## Core Architecture
 
@@ -108,7 +122,6 @@ curl --location 'localhost:8080/api/tasks/' \
 
 6. **Data Persistence**
    - Delete operations are implemented as soft deletes to maintain data integrity and audit history
-   - Task status changes and error conditions are logged in the database
 
 ## Infrastructure & Scaling
 
@@ -116,7 +129,6 @@ curl --location 'localhost:8080/api/tasks/' \
    - Authentication might be unnecessary if the service operates within a private subnet of a VPC:
      - No connection to internet gateway (blocks inbound traffic)
      - Connected to NAT Gateway for outbound traffic
-   - Consider implementing additional security based on deployment environment
 
 8. **External Integrations**
    - External service responses are currently mocked in consumer implementations
@@ -124,12 +136,5 @@ curl --location 'localhost:8080/api/tasks/' \
 
 ## Development Notes
 
-9. **Testing Approach**
-   - Service implementations include mocks for external dependencies
-   - Unit tests should verify the complete task lifecycle
-   - Consider implementing integration tests that validate the end-to-end task processing
-
-10. **Future Enhancements**
-    - Replace in-memory queue with durable message queue (e.g., SQS, RabbitMQ, Kafka)
-    - Implement metrics and monitoring for task processing
+11. **Future Enhancements**
     - Add retry policies with exponential backoff for transient failures
