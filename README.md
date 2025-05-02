@@ -8,7 +8,7 @@
 - [Technical Overview](#technical-overview)
 
 ## Video Walkthrough
-[Link to video walkthrough]
+https://www.loom.com/share/d0bcca443ea542c1ad992b7ce16e54d6?sid=18b9f08f-efae-42c1-9ca8-ca9df885e942
 
 ## Tech Stack
 - Golang
